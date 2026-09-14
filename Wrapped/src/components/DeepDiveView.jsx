@@ -37,7 +37,7 @@ export function DeepDiveView({
   // Estado Vazio para Mês sem dados registrados
   if (data.is_empty || !stats.total_plays || stats.total_plays === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center w-full max-w-4xl mx-auto py-12 px-6 bg-[#0d0e17] border border-white/[0.08] rounded-3xl shadow-2xl animate-fade-in">
+      <div className="flex flex-col items-center justify-center text-center w-full max-w-3xl mx-auto self-center my-6 py-12 px-6 sm:px-10 bg-[#0d0e17] border border-white/[0.08] rounded-3xl shadow-2xl animate-fade-in">
         <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 mb-4 shadow-inner">
           <Clock size={30} className="text-[#1db954]" />
         </div>
@@ -46,30 +46,30 @@ export function DeepDiveView({
           Histórico Não Consolidado
         </span>
 
-        <h2 className="text-3xl sm:text-4xl font-black text-white capitalize mb-3">
+        <h2 className="text-2xl sm:text-4xl font-black text-white capitalize mb-3">
           {monthName} {year}
         </h2>
 
-        <p className="text-zinc-400 text-sm max-w-lg leading-relaxed mb-8">
-          Você pode reconstruir este mês instantaneamente usando seu histórico oficial do Spotify (sem precisar pedir nem importar arquivo GDPR), ou importar seu arquivo GDPR se possuir um backup.
+        <p className="text-zinc-400 text-xs sm:text-sm max-w-lg leading-relaxed mb-8">
+          Você pode reconstruir este mês instantaneamente usando seu histórico oficial do Spotify (sem precisar de arquivos), ou importar seu arquivo GDPR se possuir um backup.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-xl">
           {onReconstructMonth && (
             <button
               onClick={() => onReconstructMonth(year, data.month)}
               disabled={isReconstructing}
-              className="flex items-center gap-2 bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold px-6 py-3 rounded-2xl text-xs sm:text-sm shadow-xl shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex items-center justify-center gap-2 bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold px-5 py-3 rounded-2xl text-xs sm:text-sm shadow-xl shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
             >
               <Zap size={16} className={isReconstructing ? 'animate-spin' : ''} />
-              <span>{isReconstructing ? 'Reconstruindo via Spotify...' : 'Reconstruir este Mês via Spotify (Sem GDPR)'}</span>
+              <span>{isReconstructing ? 'Reconstruindo via Spotify...' : 'Reconstruir Mês via Spotify'}</span>
             </button>
           )}
 
           {onOpenGDPR && (
             <button
               onClick={onOpenGDPR}
-              className="bg-white/10 hover:bg-white/15 text-zinc-200 font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm border border-white/10 transition-all cursor-pointer"
+              className="bg-white/10 hover:bg-white/15 text-zinc-200 font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm border border-white/10 transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
               Importar GDPR Manual
             </button>
@@ -78,7 +78,7 @@ export function DeepDiveView({
           {onGoToActiveMonth && (
             <button
               onClick={onGoToActiveMonth}
-              className="text-zinc-400 hover:text-white text-xs sm:text-sm font-semibold px-4 py-2 transition-all cursor-pointer"
+              className="text-zinc-400 hover:text-white text-xs sm:text-sm font-semibold px-4 py-2 transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
               Voltar ao Mês Ativo
             </button>

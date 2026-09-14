@@ -123,9 +123,12 @@ app.post('/api/auth/spotify/exchange', async (req, res) => {
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
 
     // Iniciar sync inicial completo (recentes + top tracks e fotos de artistas)
-    IngestionWorker.syncUserRecentlyPlayed(user)
-      .then(() => IngestionWorker.enrichUserTopTracks(user))
-      .catch(console.error);
+    try {
+      await IngestionWorker.syncUserRecentlyPlayed(user);
+      await IngestionWorker.enrichUserTopTracks(user);
+    } catch (syncErr) {
+      console.warn('Sync inicial não-bloqueante:', syncErr.message);
+    }
 
     res.json({
       user: {
@@ -340,6 +343,30 @@ app.post('/api/sync/gdpr', upload.any(), async (req, res) => {
   } catch (err) {
     console.error('Erro ao importar arquivo(s) GDPR:', err.message);
     res.status(400).json({ error: err.message || 'Arquivo inválido ou erro no processamento do histórico do Spotify' });
+  }
+});
+
+// 10.1 Importação em Lote Direto (Evita limite de 4.5MB da Vercel processando arquivos grandes no cliente)
+app.post('/api/sync/gdpr-batch', async (req, res) => {
+  const user = getSessionUser(req);
+  if (!user) {
+    return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
+
+  const { streams } = req.body;
+  if (!Array.isArray(streams) || streams.length === 0) {
+    return res.status(400).json({ error: 'Lista de streams vazia ou inválida.' });
+  }
+
+  try {
+    const result = await IngestionWorker.importGDPRHistory(user.id, streams);
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (err) {
+    console.error('Erro ao processar lote GDPR:', err.message);
+    res.status(500).json({ error: err.message || 'Erro ao processar lote de reproduções' });
   }
 });
 

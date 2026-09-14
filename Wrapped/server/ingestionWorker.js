@@ -541,6 +541,13 @@ export class IngestionWorker {
     let validStreams = 0;
     let insertedPlays = 0;
 
+    // Cache de artistas existentes para evitar duplicatas e reusar IDs oficiais do Spotify
+    const artistCache = new Map();
+    const existingArtists = db.prepare('SELECT id, name FROM artists').all();
+    for (const ea of existingArtists) {
+      artistCache.set(ea.name.toLowerCase().trim(), ea.id);
+    }
+
     db.exec('BEGIN');
     try {
       for (const entry of streamList) {
@@ -562,10 +569,16 @@ export class IngestionWorker {
           trackId = `gdpr_${Buffer.from(`${trackName}_${artistName}`).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 22)}`;
         }
 
-        const artistId = `art_${Buffer.from(artistName || 'Desconhecido').toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20)}`;
+        const cleanArtistName = (artistName || 'Artista Desconhecido').trim();
+        const artistKey = cleanArtistName.toLowerCase();
+        let artistId = artistCache.get(artistKey);
+        if (!artistId) {
+          artistId = `art_${Buffer.from(cleanArtistName).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20)}`;
+          insertArtistStmt.run(artistId, cleanArtistName, null, '[]');
+          artistCache.set(artistKey, artistId);
+        }
 
         insertTrackStmt.run(trackId, trackName, 'album_gdpr', albumName, null, msPlayed);
-        insertArtistStmt.run(artistId, artistName || 'Artista Desconhecido', null, '[]');
         insertTrackArtistStmt.run(trackId, artistId);
 
         const info = insertPlayStmt.run(userId, trackId, new Date(playedAt).toISOString(), msPlayed);

@@ -1,8 +1,32 @@
 import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
+import fs from 'node:fs';
 
 const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-const dbPath = isServerless ? path.join('/tmp', 'wrapped.db') : path.resolve(process.cwd(), 'wrapped.db');
+let dbPath = path.resolve(process.cwd(), 'wrapped.db');
+
+if (isServerless) {
+  const tmpDbPath = path.join('/tmp', 'wrapped.db');
+  if (!fs.existsSync(tmpDbPath)) {
+    const possibleSeedPaths = [
+      path.resolve(process.cwd(), 'wrapped.db'),
+      path.resolve(process.cwd(), 'Wrapped', 'wrapped.db'),
+      path.join(process.cwd(), '..', 'wrapped.db'),
+    ];
+    for (const seedPath of possibleSeedPaths) {
+      if (fs.existsSync(seedPath)) {
+        try {
+          fs.copyFileSync(seedPath, tmpDbPath);
+          break;
+        } catch (e) {
+          console.warn('[db] Falha ao copiar seed:', e.message);
+        }
+      }
+    }
+  }
+  dbPath = tmpDbPath;
+}
+
 const db = new DatabaseSync(dbPath);
 
 // Ativar modo WAL para alta performance e concorrência

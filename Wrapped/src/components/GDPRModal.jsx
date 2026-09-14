@@ -1,10 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { X, UploadCloud, CheckCircle2, AlertCircle, FileText, Loader2, Info } from 'lucide-react';
 import axios from 'axios';
+import JSZip from 'jszip';
 
 export function GDPRModal({ isOpen, onClose, userId, onImportSuccess }) {
   const [files, setFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [progressStatus, setProgressStatus] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
@@ -29,28 +31,83 @@ export function GDPRModal({ isOpen, onClose, userId, onImportSuccess }) {
     if (files.length === 0) return;
     setIsUploading(true);
     setError(null);
-
-    const formData = new FormData();
-    files.forEach(f => {
-      formData.append('files', f);
-    });
+    setProgressStatus('Lendo arquivos do Spotify...');
 
     try {
-      const response = await axios.post('/api/sync/gdpr', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'x-user-id': userId,
-        },
+      let allStreams = [];
+
+      for (const file of files) {
+        const lowerName = file.name.toLowerCase();
+        if (lowerName.endsWith('.zip')) {
+          setProgressStatus(`Descompactando ${file.name}...`);
+          const zip = await JSZip.loadAsync(file);
+          const entries = Object.keys(zip.files);
+          for (const entryName of entries) {
+            if (entryName.match(/(endsong|streaming_history_audio|streaminghistory).*\.json$/i)) {
+              const fileData = await zip.file(entryName).async('string');
+              try {
+                const parsed = JSON.parse(fileData);
+                if (Array.isArray(parsed)) {
+                  allStreams.push(...parsed);
+                }
+              } catch (parseErr) {
+                console.warn(`Aviso ao ler ${entryName}:`, parseErr);
+              }
+            }
+          }
+        } else if (lowerName.endsWith('.json')) {
+          const text = await file.text();
+          try {
+            const parsed = JSON.parse(text);
+            if (Array.isArray(parsed)) {
+              allStreams.push(...parsed);
+            }
+          } catch (parseErr) {
+            console.warn(`Aviso ao ler ${file.name}:`, parseErr);
+          }
+        }
+      }
+
+      if (allStreams.length === 0) {
+        throw new Error('Nenhum dado válido de histórico (endsong_*.json ou Streaming_History_Audio_*.json) foi encontrado nos arquivos.');
+      }
+
+      // Enviar em lotes de 1500 reproduções (evita 100% o limite de 4.5MB da Vercel)
+      const BATCH_SIZE = 1500;
+      const totalBatches = Math.ceil(allStreams.length / BATCH_SIZE);
+      let totalInserted = 0;
+      let totalValid = 0;
+
+      for (let i = 0; i < totalBatches; i++) {
+        const start = i * BATCH_SIZE;
+        const batch = allStreams.slice(start, start + BATCH_SIZE);
+        const percent = Math.round(((i + 1) / totalBatches) * 100);
+        setProgressStatus(`Importando: lote ${i + 1} de ${totalBatches} (${percent}%)...`);
+
+        const res = await axios.post('/api/sync/gdpr-batch', { streams: batch }, {
+          headers: { 'x-user-id': userId },
+        });
+
+        if (res.data) {
+          totalInserted += res.data.inserted || 0;
+          totalValid += res.data.validStreams || 0;
+        }
+      }
+
+      setResult({
+        validStreams: totalValid || allStreams.length,
+        inserted: totalInserted,
       });
 
-      setResult(response.data);
       if (onImportSuccess) {
         onImportSuccess();
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao processar o arquivo. Verifique o formato.');
+      console.error('Erro na importação GDPR:', err);
+      setError(err.response?.data?.error || err.message || 'Erro ao processar o arquivo. Verifique o formato.');
     } finally {
       setIsUploading(false);
+      setProgressStatus('');
     }
   };
 
@@ -124,6 +181,14 @@ export function GDPRModal({ isOpen, onClose, userId, onImportSuccess }) {
             </div>
           )}
         </div>
+
+        {/* Status do Progresso em Tempo Real */}
+        {isUploading && progressStatus && (
+          <div className="mt-4 p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl flex items-center gap-2.5 text-emerald-300 text-xs animate-pulse">
+            <Loader2 size={16} className="animate-spin text-emerald-400 shrink-0" />
+            <span className="font-semibold">{progressStatus}</span>
+          </div>
+        )}
 
         {/* Feedback de Erro */}
         {error && (

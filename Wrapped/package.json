@@ -25,6 +25,7 @@
     "express": "^5.2.1",
     "fast-average-color": "^9.6.0",
     "html-to-image": "^1.11.13",
+    "jszip": "^3.10.2",
     "lucide-react": "^1.45.0",
     "multer": "^2.3.0",
     "react": "^19.2.8",

@@ -141,22 +141,29 @@ export class AnalyticsEngine {
     // 3. Top Artistas e Identificação de Estreantes (Newcomers)
     const topArtistsStmt = db.prepare(`
       SELECT 
-        a.id AS artist_id,
-        a.name AS artist_name,
-        a.image_url,
-        a.genres,
+        COALESCE(
+          MAX(CASE WHEN a.id NOT LIKE 'art_%' THEN a.id END),
+          MAX(a.id)
+        ) AS artist_id,
+        MAX(a.name) AS artist_name,
+        MAX(a.image_url) AS image_url,
+        COALESCE(
+          MAX(CASE WHEN a.genres IS NOT NULL AND a.genres != '[]' THEN a.genres END),
+          '[]'
+        ) AS genres,
         COUNT(p.id) AS play_count,
         EXISTS (
           SELECT 1 
           FROM play_logs prev_p
           JOIN track_artists prev_ta ON prev_p.track_id = prev_ta.track_id AND prev_ta.position = 0
-          WHERE prev_p.user_id = ? AND prev_ta.artist_id = a.id AND prev_p.played_at < ?
+          JOIN artists prev_a ON prev_ta.artist_id = prev_a.id
+          WHERE prev_p.user_id = ? AND LOWER(TRIM(prev_a.name)) = LOWER(TRIM(a.name)) AND prev_p.played_at < ?
         ) AS has_prior_plays
       FROM play_logs p
       JOIN track_artists ta ON p.track_id = ta.track_id AND ta.position = 0
       JOIN artists a ON ta.artist_id = a.id
       WHERE p.user_id = ? AND p.played_at >= ? AND p.played_at < ?
-      GROUP BY a.id, a.name, a.image_url, a.genres
+      GROUP BY LOWER(TRIM(a.name))
       ORDER BY play_count DESC
       LIMIT 20
     `);
