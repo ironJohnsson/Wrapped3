@@ -262,13 +262,19 @@ export function WrappedStories({ data, monthName, year, onClose }) {
                 </span>
 
                 <div className="relative my-1">
-                  <img
-                    src={topTrack?.album_image_url}
-                    alt={topTrack?.track_name}
-                    crossOrigin="anonymous"
-                    className="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl shadow-2xl object-cover ring-2 ring-pink-500/40"
-                  />
-                  <div className="absolute -bottom-2 -right-2 bg-pink-500 text-white font-black text-[11px] px-3 py-0.5 rounded-full shadow-lg">
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl shadow-2xl overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900 ring-2 ring-pink-500/40">
+                    {topTrack?.album_image_url ? (
+                      <img
+                        src={topTrack.album_image_url}
+                        alt={topTrack.track_name}
+                        crossOrigin="anonymous"
+                        className="w-full h-full object-cover relative z-10"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : null}
+                    <Music size={40} className="text-pink-400 absolute" />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-pink-500 text-white font-black text-[11px] px-3 py-0.5 rounded-full shadow-lg z-20">
                     #1 no Mês
                   </div>
                 </div>
@@ -298,14 +304,18 @@ export function WrappedStories({ data, monthName, year, onClose }) {
                       <span className="text-xs font-mono font-black text-zinc-400 w-4 text-center shrink-0">
                         #{track.rank}
                       </span>
-                      {track.album_image_url && (
-                        <img
-                          src={track.album_image_url}
-                          alt={track.track_name}
-                          crossOrigin="anonymous"
-                          className="w-7 h-7 rounded-lg object-cover shadow-xs shrink-0 border border-white/10"
-                        />
-                      )}
+                      <div className="w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 shrink-0 relative flex items-center justify-center">
+                        {track.album_image_url ? (
+                          <img
+                            src={track.album_image_url}
+                            alt={track.track_name}
+                            crossOrigin="anonymous"
+                            className="w-full h-full object-cover relative z-10"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        ) : null}
+                        <Music size={11} className="text-pink-400 absolute" />
+                      </div>
                       <div className="min-w-0 flex-1 text-left">
                         <p className="text-xs font-bold text-white truncate leading-snug">{track.track_name}</p>
                         <p className="text-[10px] text-zinc-400 truncate">{track.artist_name}</p>

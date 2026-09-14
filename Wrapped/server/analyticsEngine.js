@@ -108,7 +108,16 @@ export class AnalyticsEngine {
         t.id AS track_id,
         t.name AS track_name,
         t.album_name,
-        t.album_image_url,
+        COALESCE(
+          t.album_image_url,
+          (
+            SELECT a.image_url 
+            FROM track_artists ta 
+            JOIN artists a ON ta.artist_id = a.id 
+            WHERE ta.track_id = t.id AND a.image_url IS NOT NULL 
+            LIMIT 1
+          )
+        ) AS album_image_url,
         t.duration_ms,
         COUNT(p.id) AS play_count,
         ROUND(SUM(p.ms_played) / 60000.0) AS minutes_listened,
@@ -122,7 +131,7 @@ export class AnalyticsEngine {
       FROM play_logs p
       JOIN tracks t ON p.track_id = t.id
       WHERE p.user_id = ? AND p.played_at >= ? AND p.played_at < ?
-      GROUP BY t.id, t.name, t.album_name, t.album_image_url, t.duration_ms
+      GROUP BY t.id, t.name, t.album_name, t.duration_ms
       ORDER BY play_count DESC, minutes_listened DESC
       LIMIT 20
     `);
@@ -357,7 +366,16 @@ export class AnalyticsEngine {
         t.id AS track_id,
         t.name AS track_name,
         t.album_name,
-        t.album_image_url,
+        COALESCE(
+          t.album_image_url,
+          (
+            SELECT a.image_url 
+            FROM track_artists ta 
+            JOIN artists a ON ta.artist_id = a.id 
+            WHERE ta.track_id = t.id AND a.image_url IS NOT NULL 
+            LIMIT 1
+          )
+        ) AS album_image_url,
         (
           SELECT a.name 
           FROM track_artists ta 
@@ -369,7 +387,7 @@ export class AnalyticsEngine {
       FROM play_logs p
       JOIN tracks t ON p.track_id = t.id
       WHERE p.user_id = ? AND p.played_at >= ? AND p.played_at < ?
-      GROUP BY t.id, t.name, t.album_name, t.album_image_url
+      GROUP BY t.id, t.name, t.album_name
       HAVING COUNT(p.id) >= 4
       ORDER BY burst_count DESC
       LIMIT 4
