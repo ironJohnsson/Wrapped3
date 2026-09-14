@@ -155,7 +155,16 @@ export class AnalyticsEngine {
           MAX(a.id)
         ) AS artist_id,
         MAX(a.name) AS artist_name,
-        MAX(a.image_url) AS image_url,
+        COALESCE(
+          MAX(a.image_url),
+          (
+            SELECT t.album_image_url 
+            FROM track_artists ta2 
+            JOIN tracks t ON ta2.track_id = t.id 
+            WHERE ta2.artist_id = a.id AND t.album_image_url IS NOT NULL 
+            LIMIT 1
+          )
+        ) AS image_url,
         COALESCE(
           MAX(CASE WHEN a.genres IS NOT NULL AND a.genres != '[]' THEN a.genres END),
           '[]'
