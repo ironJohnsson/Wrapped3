@@ -405,14 +405,18 @@ export function DeepDiveView({
                       <span className="font-mono text-xs font-black text-zinc-500 w-6 group-hover:text-purple-400 transition-colors shrink-0">
                         {String(art.rank).padStart(2, '0')}
                       </span>
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-800 border border-white/10 shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/15 shrink-0 shadow-md group-hover:scale-105 transition-transform relative flex items-center justify-center">
                         {art.image_url ? (
-                          <img src={art.image_url} alt={art.artist_name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-400">
-                            {art.artist_name.charAt(0)}
-                          </div>
-                        )}
+                          <img
+                            src={art.image_url}
+                            alt={art.artist_name}
+                            className="w-full h-full object-cover relative z-10"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        ) : null}
+                        <div className="w-full h-full flex items-center justify-center font-black text-base text-purple-300">
+                          {art.artist_name.charAt(0)}
+                        </div>
                       </div>
                       <div className="min-w-0 flex-1 pr-3">
                         <div className="flex items-center gap-2">
@@ -686,14 +690,18 @@ export function DeepDiveView({
                   <span className="font-mono text-base font-black text-zinc-500 w-6 group-hover:text-purple-400 transition-colors">
                     {String(art.rank).padStart(2, '0')}
                   </span>
-                  <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-800 border border-white/10 shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/15 shrink-0 shadow-md group-hover:scale-105 transition-transform relative flex items-center justify-center">
                     {art.image_url ? (
-                      <img src={art.image_url} alt={art.artist_name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center font-bold text-zinc-400">
-                        {art.artist_name.charAt(0)}
-                      </div>
-                    )}
+                      <img
+                        src={art.image_url}
+                        alt={art.artist_name}
+                        className="w-full h-full object-cover relative z-10"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : null}
+                    <div className="w-full h-full flex items-center justify-center font-black text-lg text-purple-300">
+                      {art.artist_name.charAt(0)}
+                    </div>
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold text-white truncate group-hover:text-purple-300 transition-colors">
