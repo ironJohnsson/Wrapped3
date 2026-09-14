@@ -1,5 +1,6 @@
 import React from 'react';
 import { RefreshCw, UploadCloud, LogOut, LogIn, User, Sparkles } from 'lucide-react';
+import { ArtistAvatar } from './ArtistAvatar';
 
 export function Navbar({ user, onSync, isSyncing, onOpenGDPR, onLogin, onLogout }) {
   return (
@@ -52,13 +53,13 @@ export function Navbar({ user, onSync, isSyncing, onOpenGDPR, onLogin, onLogout 
 
               {/* Perfil */}
               <div className="flex items-center gap-2 pl-2 border-l border-white/[0.08]">
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-white/20 flex items-center justify-center shrink-0">
-                  {user.avatar_url ? (
-                    <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <User size={15} className="text-zinc-400" />
-                  )}
-                </div>
+                <ArtistAvatar
+                  src={user.avatar_url}
+                  name={user.display_name}
+                  size="w-8 h-8"
+                  textSize="text-xs"
+                  borderColor="border-white/20"
+                />
                 <span className="text-xs font-bold text-white hidden lg:inline max-w-[120px] truncate">
                   {user.display_name}
                 </span>

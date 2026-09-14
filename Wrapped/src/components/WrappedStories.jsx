@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { AudioRadarChart } from './AudioRadarChart';
 import { ListeningClockChart } from './ListeningClockChart';
+import { TrackCover } from './TrackCover';
+import { ArtistAvatar } from './ArtistAvatar';
 
 // Paleta de Mesh Gradients vibrantes oficiais estilo Spotify Wrapped para cada slide
 const SLIDE_THEMES = [
@@ -262,18 +264,15 @@ export function WrappedStories({ data, monthName, year, onClose }) {
                 </span>
 
                 <div className="relative my-1">
-                  <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl shadow-2xl overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900 ring-2 ring-pink-500/40">
-                    {topTrack?.album_image_url ? (
-                      <img
-                        src={topTrack.album_image_url}
-                        alt={topTrack.track_name}
-                        crossOrigin="anonymous"
-                        className="w-full h-full object-cover relative z-10"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      />
-                    ) : null}
-                    <Music size={40} className="text-pink-400 absolute" />
-                  </div>
+                  <TrackCover
+                    src={topTrack?.album_image_url}
+                    title={topTrack?.track_name}
+                    size="w-32 h-32 sm:w-36 sm:h-36"
+                    iconSize={40}
+                    iconColor="text-pink-400"
+                    crossOrigin="anonymous"
+                    className="rounded-2xl shadow-2xl ring-2 ring-pink-500/40"
+                  />
                   <div className="absolute -bottom-2 -right-2 bg-pink-500 text-white font-black text-[11px] px-3 py-0.5 rounded-full shadow-lg z-20">
                     #1 no Mês
                   </div>
@@ -304,18 +303,15 @@ export function WrappedStories({ data, monthName, year, onClose }) {
                       <span className="text-xs font-mono font-black text-zinc-400 w-4 text-center shrink-0">
                         #{track.rank}
                       </span>
-                      <div className="w-7 h-7 rounded-lg overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 shrink-0 relative flex items-center justify-center">
-                        {track.album_image_url ? (
-                          <img
-                            src={track.album_image_url}
-                            alt={track.track_name}
-                            crossOrigin="anonymous"
-                            className="w-full h-full object-cover relative z-10"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        ) : null}
-                        <Music size={11} className="text-pink-400 absolute" />
-                      </div>
+                      <TrackCover
+                        src={track.album_image_url}
+                        title={track.track_name}
+                        size="w-7 h-7"
+                        iconSize={11}
+                        iconColor="text-pink-400"
+                        crossOrigin="anonymous"
+                        className="rounded-lg"
+                      />
                       <div className="min-w-0 flex-1 text-left">
                         <p className="text-xs font-bold text-white truncate leading-snug">{track.track_name}</p>
                         <p className="text-[10px] text-zinc-400 truncate">{track.artist_name}</p>
@@ -342,18 +338,15 @@ export function WrappedStories({ data, monthName, year, onClose }) {
                 </h2>
 
                 <div className="flex flex-col items-center mt-1">
-                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-cyan-400 shadow-[0_0_35px_rgba(6,182,212,0.4)] bg-zinc-800 flex items-center justify-center">
-                    {topArtist?.image_url ? (
-                      <img
-                        src={topArtist.image_url}
-                        alt={topArtist.artist_name}
-                        crossOrigin="anonymous"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <User size={44} className="text-zinc-400" />
-                    )}
-                  </div>
+                  <ArtistAvatar
+                    src={topArtist?.image_url}
+                    name={topArtist?.artist_name}
+                    size="w-28 h-28 sm:w-32 sm:h-32"
+                    textSize="text-3xl"
+                    borderColor="border-4 border-cyan-400"
+                    crossOrigin="anonymous"
+                    className="shadow-[0_0_35px_rgba(6,182,212,0.4)]"
+                  />
 
                   <div className="mt-2.5 bg-cyan-400 text-black text-[11px] font-black px-3.5 py-0.5 rounded-full shadow-lg">
                     {topArtist?.play_count} reproduções
@@ -386,18 +379,15 @@ export function WrappedStories({ data, monthName, year, onClose }) {
                       <span className="text-xs font-mono font-black text-zinc-400 w-4 text-center shrink-0">
                         #{art.rank}
                       </span>
-                      {art.image_url ? (
-                        <img
-                          src={art.image_url}
-                          alt={art.artist_name}
-                          crossOrigin="anonymous"
-                          className="w-7 h-7 rounded-full object-cover shadow-xs shrink-0 border border-white/10"
-                        />
-                      ) : (
-                        <div className="w-7 h-7 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center shrink-0">
-                          <User size={12} className="text-cyan-400" />
-                        </div>
-                      )}
+                      <ArtistAvatar
+                        src={art.image_url}
+                        name={art.artist_name}
+                        size="w-7 h-7"
+                        textSize="text-[10px]"
+                        borderColor="border-white/10"
+                        crossOrigin="anonymous"
+                        className="rounded-full shadow-xs"
+                      />
                       <div className="min-w-0 flex-1 text-left">
                         <p className="text-xs font-bold text-white truncate">{art.artist_name}</p>
                         {art.is_newcomer && (
@@ -548,11 +538,14 @@ export function WrappedStories({ data, monthName, year, onClose }) {
                       key={obs.track_id}
                       className="flex items-center gap-3 bg-black/55 backdrop-blur-xl p-3 rounded-xl border border-white/15 shadow-md"
                     >
-                      <img
+                      <TrackCover
                         src={obs.album_image_url || topTrack?.album_image_url}
-                        alt={obs.track_name}
+                        title={obs.track_name}
+                        size="w-11 h-11"
+                        iconSize={16}
+                        iconColor="text-red-400"
                         crossOrigin="anonymous"
-                        className="w-11 h-11 rounded-lg object-cover shadow-sm shrink-0 border border-white/10"
+                        className="rounded-lg border-white/10"
                       />
                       <div className="flex-1 min-w-0 text-left">
                         <p className="text-xs font-bold text-white truncate leading-snug">{obs.track_name}</p>
@@ -594,11 +587,14 @@ export function WrappedStories({ data, monthName, year, onClose }) {
 
               {/* Destaque Faixa #1 */}
               <div className="flex items-center gap-3 bg-black/60 backdrop-blur-xl p-2.5 sm:p-3 rounded-xl border border-white/15 my-1">
-                <img
+                <TrackCover
                   src={topTrack?.album_image_url}
-                  alt={topTrack?.track_name}
+                  title={topTrack?.track_name}
+                  size="w-12 h-12"
+                  iconSize={18}
+                  iconColor="text-[#1db954]"
                   crossOrigin="anonymous"
-                  className="w-12 h-12 rounded-lg object-cover border border-white/15 shadow-lg shrink-0"
+                  className="rounded-lg border-white/15 shadow-lg"
                 />
                 <div className="flex-1 min-w-0 text-left">
                   <span className="text-[9px] uppercase tracking-wider text-[#1db954] font-black">Música #1</span>

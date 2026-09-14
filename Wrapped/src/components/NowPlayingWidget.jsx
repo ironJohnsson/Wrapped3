@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Music, ExternalLink, Radio, Volume2, Disc, Play } from 'lucide-react';
+import { TrackCover } from './TrackCover';
 
 export function NowPlayingWidget({ currentlyPlaying }) {
   const [localProgress, setLocalProgress] = useState(0);
@@ -86,10 +87,12 @@ export function NowPlayingWidget({ currentlyPlaying }) {
         <div className="flex items-center gap-3.5 min-w-0 flex-1">
           {/* Capa com animação de vinil e indicador de reprodução */}
           <div className="relative shrink-0">
-            <img
+            <TrackCover
               src={item.album_image_url}
-              alt={item.track_name}
-              className="w-14 h-14 rounded-2xl object-cover shadow-lg border border-white/15 group-hover:scale-105 transition-transform"
+              title={item.track_name}
+              size="w-14 h-14"
+              iconSize={22}
+              className="rounded-2xl border-white/15 group-hover:scale-105 transition-transform"
             />
             {/* Equalizador animado no canto */}
             <div className="absolute -bottom-1 -right-1 bg-[#1db954] text-black p-1 rounded-full shadow-md flex items-center justify-center">

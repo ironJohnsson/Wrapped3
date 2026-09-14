@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { AudioRadarChart } from './AudioRadarChart';
 import { ListeningClockChart } from './ListeningClockChart';
+import { TrackCover } from './TrackCover';
+import { ArtistAvatar } from './ArtistAvatar';
 
 export function DeepDiveView({ 
   data, 
@@ -322,17 +324,13 @@ export function DeepDiveView({
                       <span className="font-mono text-xs font-black text-zinc-500 w-6 group-hover:text-[#1db954] transition-colors shrink-0">
                         {String(track.rank).padStart(2, '0')}
                       </span>
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 shrink-0 shadow-md group-hover:scale-105 transition-transform overflow-hidden relative flex items-center justify-center">
-                        {track.album_image_url ? (
-                          <img
-                            src={track.album_image_url}
-                            alt={track.track_name}
-                            className="w-full h-full object-cover relative z-10"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        ) : null}
-                        <Music size={18} className="text-[#1db954] absolute" />
-                      </div>
+                      <TrackCover
+                        src={track.album_image_url}
+                        title={track.track_name}
+                        size="w-12 h-12"
+                        iconSize={18}
+                        className="group-hover:scale-105 transition-transform"
+                      />
                       <div className="min-w-0 flex-1 pr-3">
                         <p className="text-sm font-bold text-white truncate leading-snug group-hover:text-[#1db954] transition-colors pb-0.5">
                           {track.track_name}
@@ -405,19 +403,13 @@ export function DeepDiveView({
                       <span className="font-mono text-xs font-black text-zinc-500 w-6 group-hover:text-purple-400 transition-colors shrink-0">
                         {String(art.rank).padStart(2, '0')}
                       </span>
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/15 shrink-0 shadow-md group-hover:scale-105 transition-transform relative flex items-center justify-center">
-                        {art.image_url ? (
-                          <img
-                            src={art.image_url}
-                            alt={art.artist_name}
-                            className="w-full h-full object-cover relative z-10"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        ) : null}
-                        <div className="w-full h-full flex items-center justify-center font-black text-base text-purple-300">
-                          {art.artist_name.charAt(0)}
-                        </div>
-                      </div>
+                      <ArtistAvatar
+                        src={art.image_url}
+                        name={art.artist_name}
+                        size="w-12 h-12"
+                        textSize="text-base"
+                        className="group-hover:scale-105 transition-transform"
+                      />
                       <div className="min-w-0 flex-1 pr-3">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-bold text-white truncate leading-snug group-hover:text-purple-300 transition-colors pb-0.5">
@@ -527,17 +519,14 @@ export function DeepDiveView({
                           className="flex items-center justify-between bg-red-950/20 border border-red-500/20 p-3.5 rounded-2xl"
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-red-500/20 shrink-0 shadow-md overflow-hidden relative flex items-center justify-center">
-                              {obs.album_image_url ? (
-                                <img
-                                  src={obs.album_image_url}
-                                  alt={obs.track_name}
-                                  className="w-full h-full object-cover relative z-10"
-                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                />
-                              ) : null}
-                              <Flame size={16} className="text-red-400 absolute" />
-                            </div>
+                            <TrackCover
+                              src={obs.album_image_url}
+                              title={obs.track_name}
+                              size="w-11 h-11"
+                              iconSize={16}
+                              iconColor="text-red-400"
+                              className="border-red-500/20"
+                            />
                             <div className="min-w-0 flex-1 pr-2">
                               <p className="text-xs font-bold text-white truncate">{obs.track_name}</p>
                               <p className="text-[11px] text-zinc-400 truncate">{obs.artist_name}</p>
@@ -611,17 +600,13 @@ export function DeepDiveView({
                   <span className="font-mono text-base font-black text-zinc-500 w-7 group-hover:text-[#1db954] transition-colors">
                     {String(track.rank).padStart(2, '0')}
                   </span>
-                  <div className="w-13 h-13 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 shrink-0 shadow-md group-hover:scale-105 transition-transform overflow-hidden relative flex items-center justify-center">
-                    {track.album_image_url ? (
-                      <img
-                        src={track.album_image_url}
-                        alt={track.track_name}
-                        className="w-full h-full object-cover relative z-10"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      />
-                    ) : null}
-                    <Music size={20} className="text-[#1db954] absolute" />
-                  </div>
+                  <TrackCover
+                    src={track.album_image_url}
+                    title={track.track_name}
+                    size="w-13 h-13"
+                    iconSize={20}
+                    className="group-hover:scale-105 transition-transform"
+                  />
                   <div className="min-w-0 flex-1 pr-3">
                     <p className="text-sm sm:text-base font-bold text-white truncate group-hover:text-[#1db954] transition-colors">
                       {track.track_name}
@@ -690,19 +675,13 @@ export function DeepDiveView({
                   <span className="font-mono text-base font-black text-zinc-500 w-6 group-hover:text-purple-400 transition-colors">
                     {String(art.rank).padStart(2, '0')}
                   </span>
-                  <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-purple-900/60 to-zinc-900 border border-white/15 shrink-0 shadow-md group-hover:scale-105 transition-transform relative flex items-center justify-center">
-                    {art.image_url ? (
-                      <img
-                        src={art.image_url}
-                        alt={art.artist_name}
-                        className="w-full h-full object-cover relative z-10"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      />
-                    ) : null}
-                    <div className="w-full h-full flex items-center justify-center font-black text-lg text-purple-300">
-                      {art.artist_name.charAt(0)}
-                    </div>
-                  </div>
+                  <ArtistAvatar
+                    src={art.image_url}
+                    name={art.artist_name}
+                    size="w-14 h-14"
+                    textSize="text-lg"
+                    className="group-hover:scale-105 transition-transform"
+                  />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold text-white truncate group-hover:text-purple-300 transition-colors">
                       {art.artist_name}
