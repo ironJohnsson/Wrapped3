@@ -134,7 +134,8 @@ export default function App() {
       } else if (code) {
         setIsLoading(true);
         try {
-          const response = await axios.post('/api/auth/spotify/exchange', { code });
+          const redirectUri = `${window.location.origin}/callback`;
+          const response = await axios.post('/api/auth/spotify/exchange', { code, redirectUri });
           if (response.data?.user) {
             localStorage.setItem('wrapped_user_id', response.data.user.id);
             setUser(response.data.user);

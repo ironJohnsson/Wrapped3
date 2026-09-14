@@ -16,7 +16,7 @@ const BACKEND_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI || 'http://127.0.0
 const FRONTEND_REDIRECT_URI = process.env.SPOTIFY_FRONTEND_REDIRECT_URI || 'http://127.0.0.1:5173/callback';
 
 app.use(cors({
-  origin: [FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: true,
   credentials: true,
 }));
 
@@ -93,13 +93,14 @@ app.get('/callback', async (req, res, next) => {
 
 // 4. Troca de code via Frontend SPA
 app.post('/api/auth/spotify/exchange', async (req, res) => {
-  const { code } = req.body;
+  const { code, redirectUri } = req.body;
   if (!code) {
     return res.status(400).json({ error: 'Code obrigatório' });
   }
 
   try {
-    const tokens = await SpotifyService.exchangeCode(code, FRONTEND_REDIRECT_URI);
+    const targetRedirectUri = redirectUri || FRONTEND_REDIRECT_URI;
+    const tokens = await SpotifyService.exchangeCode(code, targetRedirectUri);
     const profile = await SpotifyService.getCurrentUserProfile(tokens.accessToken);
 
     const existingUser = db.prepare('SELECT id FROM users WHERE spotify_id = ?').get(profile.id);

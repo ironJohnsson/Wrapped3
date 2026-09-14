@@ -1,8 +1,8 @@
 import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
-import fs from 'node:fs';
 
-const dbPath = path.resolve(process.cwd(), 'wrapped.db');
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const dbPath = isServerless ? path.join('/tmp', 'wrapped.db') : path.resolve(process.cwd(), 'wrapped.db');
 const db = new DatabaseSync(dbPath);
 
 // Ativar modo WAL para alta performance e concorrência
